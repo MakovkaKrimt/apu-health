@@ -2,10 +2,14 @@ volumes:
   apu-gs-data:
   apu-db-data:
 
+networks:
+  apu-network:
+    external: true
+
 services:
   apu-db:
     image: kartoza/postgis:${POSTGIS_VERSION_TAG}
-    container_name: apu-db
+    container_name: db
     volumes:
       - apu-db-data:/var/lib/postgresql
     ports:
@@ -23,6 +27,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 1m
+    networks:
+      - apu-network
 
   apu-geoserver:
     image: kartoza/geoserver:${GS_VERSION}
@@ -58,3 +64,5 @@ services:
       timeout: 10s
       retries: 3
       start_period: 1m
+    networks:
+      - apu-network

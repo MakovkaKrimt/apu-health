@@ -28,4 +28,5 @@ class PptxService:
         point_manager.add_points(polyclinics)
 
 
-        prs.save("result.pptx")
+        # prs.save("result.pptx")
+        prs.save(output_path)

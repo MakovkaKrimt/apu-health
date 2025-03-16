@@ -7,6 +7,7 @@ import {
   Body,
   Res,
   StreamableFile,
+  Logger,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PresentationService } from './presentation.service';
@@ -23,6 +24,8 @@ import {
 @ApiTags('Генерация PPTX')
 @Controller('presentation')
 export class PresentationController {
+  private readonly logger = new Logger(PresentationController.name);
+
   constructor(private readonly presentationService: PresentationService) {}
 
   @Post('generate')
@@ -34,14 +37,16 @@ export class PresentationController {
   ) {
     const pptxStream = await this.presentationService.generatePptx(image, dto);
 
-    return pptxStream;
+    this.logger.log(
+      `PPTX file successfully generated at ${new Date().toISOString()}`,
+    );
 
-    // res.set({
-    //   'Content-Type':
-    //     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    //   'Content-Disposition': `attachment; filename="result.pptx"`,
-    // });
+    res.set({
+      'Content-Type':
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'Content-Disposition': `attachment; filename="result.pptx"`,
+    });
 
-    // return new StreamableFile(pptxStream);
+    return new StreamableFile(pptxStream);
   }
 }

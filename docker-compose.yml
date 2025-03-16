@@ -2,6 +2,9 @@ networks:
   apu-network:
     external: true
 
+include:
+  - ./geoserver/docker-compose.yml
+
 services:
   api:
     container_name: api
@@ -14,9 +17,12 @@ services:
       - "5001:5000"
     networks:
       - apu-network
+    depends_on:
+      apu-db:
+        condition: service_healthy
 
   pptx-generator:
-    container_name: dipp-py
+    container_name: py
     build:
       context: ./backend/pptx-generator
       dockerfile: Dockerfile.prod
