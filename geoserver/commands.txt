@@ -1,0 +1,8 @@
+// Получить все доступные шрифты 
+
+$ curl -u goomdi:goomdi -XGET http://localhost:8600/geoserver/rest/fonts.xml
+
+// Смонтировать папку с кастомными шрифтами 
+
+volumes:
+    - ./fonts:/opt/fonts

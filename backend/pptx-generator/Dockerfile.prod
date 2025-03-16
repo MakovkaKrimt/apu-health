@@ -1,0 +1,28 @@
+# Этап сборки
+FROM python:3.9-slim-buster as builder
+
+WORKDIR /app
+
+# Копируем зависимости
+COPY requirements.txt .
+
+# Устанавливаем зависимости
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+# Копируем исходный код
+COPY . .
+
+# Этап production
+FROM python:3.9-slim-buster
+
+WORKDIR /app
+
+# Копируем только необходимые файлы из этапа сборки
+COPY --from=builder /root/.local /root/.local
+COPY --from=builder /app /app
+
+# Указываем порт, который будет использовать приложение
+EXPOSE 8000
+
+# Убедимся, что скрипты в .local доступны для выполнения
+ENV PATH=/root/.local/bin:$PATH
