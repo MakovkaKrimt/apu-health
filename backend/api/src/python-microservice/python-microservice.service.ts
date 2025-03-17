@@ -4,7 +4,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
 const pythonServiceHost =
-  process.env.NODE_ENV === 'production' ? 'pptx-generator' : 'localhost';
+  process.env.NODE_ENV === 'production' ? process.env.PY_SERVICE : 'localhost';
 
 @Injectable()
 export class PythonMicroserviceService {

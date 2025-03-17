@@ -9,7 +9,7 @@ networks:
 services:
   apu-db:
     image: kartoza/postgis:${POSTGIS_VERSION_TAG}
-    container_name: db
+    container_name: apu-db
     volumes:
       - apu-db-data:/var/lib/postgresql
     ports:

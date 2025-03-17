@@ -6,8 +6,8 @@ include:
   - ./geoserver/docker-compose.yml
 
 services:
-  api:
-    container_name: api
+  apu-api:
+    container_name: apu-api
     build:
       context: ./backend/api
       dockerfile: Dockerfile.prod
@@ -21,8 +21,8 @@ services:
       apu-db:
         condition: service_healthy
 
-  pptx-generator:
-    container_name: py
+  apu-pptx-generator:
+    container_name: apu-py
     build:
       context: ./backend/pptx-generator
       dockerfile: Dockerfile.prod
