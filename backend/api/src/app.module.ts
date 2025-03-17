@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { PresentationModule } from './presentation/presentation.module';
 import dbConfig from './database/config/db.config';
 import dbProductionConfig from './database/config/db-production.config';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -21,5 +23,7 @@ import dbProductionConfig from './database/config/db-production.config';
     DatabaseModule,
     PresentationModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

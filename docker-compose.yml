@@ -1,11 +1,34 @@
 networks:
   apu-network:
     external: true
-
-include:
-  - ./geoserver/docker-compose.yml
+  dipp_network:
+    external: true
 
 services:
+  apu-db:
+    image: kartoza/postgis:${POSTGIS_VERSION_TAG}
+    container_name: apu-db
+    volumes:
+      - apu-db-data:/var/lib/postgresql
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASS=${POSTGRES_PASS}
+      # - ALLOW_IP_RANGE=${ALLOW_IP_RANGE}
+      # - FORCE_SSL=TRUE
+    restart: on-failure
+    healthcheck:
+      test: "PGPASSWORD=${POSTGRES_PASS} pg_isready -h 127.0.0.1 -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 1m
+    networks:
+      - apu-network
+      - dipp_network
+
   apu-api:
     container_name: apu-api
     build:
@@ -27,7 +50,7 @@ services:
       context: ./backend/pptx-generator
       dockerfile: Dockerfile.prod
     ports:
-      - "8001:8000"
+      - "8002:8000"
     volumes:
       - ./backend/pptx-generator/app:/app/app
     environment:
