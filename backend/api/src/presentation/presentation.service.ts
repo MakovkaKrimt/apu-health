@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { PythonMicroserviceService } from '../python-microservice/python-microservice.service';
 import { DatatabaseQueryService } from 'src/database-queries/database-query.service';
-import { GenerateDto } from './dto/generate-dto';
+import { GenerateDto } from './dto/generate.dto';
 
 @Injectable()
 export class PresentationService {
@@ -16,13 +16,13 @@ export class PresentationService {
     { extent, projectAreaIsochrone, polyclinicsIsochrone }: GenerateDto,
   ) {
     const polyclinics =
-      await this.databaseQueryService.findPolyclinicsByPolyIntersection(
+      await this.databaseQueryService.findPolyclinicsByExtentIntersection(
         extent,
         projectAreaIsochrone,
       );
 
     const populationData =
-      await this.databaseQueryService.findPopulationSumByPoliesIntersections(
+      await this.databaseQueryService.findPopulationSumByIsochroneIntersections(
         projectAreaIsochrone,
         polyclinicsIsochrone,
       );

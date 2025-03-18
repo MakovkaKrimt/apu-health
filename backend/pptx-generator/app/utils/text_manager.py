@@ -13,10 +13,11 @@ class TextManager:
         total_kids = 0
 
         for clinic in polyclinics.policlinics:
-            if clinic.design_capacity_adults is not None:
-                total_adults += clinic.design_capacity_adults
-            if clinic.design_capacity_kids is not None:
-                total_kids += clinic.design_capacity_kids
+            if clinic.within_isochrone: 
+                if clinic.design_capacity_adults is not None:
+                    total_adults += clinic.design_capacity_adults
+                if clinic.design_capacity_kids is not None:
+                    total_kids += clinic.design_capacity_kids
 
         return {
             "exist_adult_capacity": total_adults,

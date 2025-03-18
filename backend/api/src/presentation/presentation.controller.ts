@@ -12,14 +12,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PresentationService } from './presentation.service';
 import { Response } from 'express';
-import { GenerateDto } from './dto/generate-dto';
-import {
-  ApiBody,
-  ApiConsumes,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { GenerateDto } from './dto/generate.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Генерация PPTX')
 @Controller('presentation')

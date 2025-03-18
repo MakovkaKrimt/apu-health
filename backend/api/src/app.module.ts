@@ -7,6 +7,7 @@ import dbConfig from './database/config/db.config';
 import dbProductionConfig from './database/config/db-production.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AnalysisModule } from './analysis/analysis.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AppService } from './app.service';
     DatabaseQueryModule,
     DatabaseModule,
     PresentationModule,
+    AnalysisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

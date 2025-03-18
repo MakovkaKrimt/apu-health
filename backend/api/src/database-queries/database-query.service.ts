@@ -10,7 +10,7 @@ export class DatatabaseQueryService {
     private readonly vPolyclinicRepository: Repository<VPolyclinic>,
   ) {}
 
-  async findPolyclinicsByPolyIntersection(
+  async findPolyclinicsByExtentIntersection(
     extent: string,
     projectAreaIsochrone: string,
   ) {
@@ -47,7 +47,41 @@ export class DatatabaseQueryService {
     return polyclinicsData;
   }
 
-  async findPopulationSumByPoliesIntersections(
+  async findPolicilinicsSumByIsochroneIntersection(
+    projectAreaIsochrone: string,
+  ) {
+    const query = `    
+      WITH isochrone_min AS (
+          SELECT 
+              ST_SetSRID(ST_GeomFromText($1), 4326) AS geom
+      ),
+      subquery as (
+      SELECT 
+          SUM(COALESCE(v.surplus_kids, 0) + COALESCE(v.deficit_kids, 0))::integer  AS total_child,
+          SUM(COALESCE(v.surplus_adults, 0) + COALESCE(v.deficit_adults, 0))::integer  AS total_adult,
+          COUNT(*) FILTER (WHERE type = 'детская')::integer AS child_count,
+          COUNT(*) FILTER (WHERE type = 'взрослая')::integer AS adult_count,
+          COUNT(*) FILTER (WHERE type = 'смешанная')::integer AS mixed_count
+      FROM
+          v_polyclinics v,
+          isochrone_min imin
+      WHERE
+          ST_Intersects(v.geom, imin.geom)
+        )
+        SELECT 
+          s.*,
+          s.child_count + s.adult_count + s.mixed_count as total_count
+        FROM subquery s;
+        `;
+
+    const policlinicsData = await this.vPolyclinicRepository.query(query, [
+      projectAreaIsochrone,
+    ]);
+
+    return policlinicsData;
+  }
+
+  async findPopulationSumByIsochroneIntersections(
     projectAreaIsochrone: string,
     polyclinicsIsochrone: string,
   ) {
