@@ -20,7 +20,7 @@ class PptxService:
         prs = Presentation(template_path)
         slide = prs.slides[0]
 
-        print('lhlhl',analysis_model)
+        # print('lhlhl',analysis_model)
 
         text_manager = TextManager(slide)
         point_manager = PointManager(slide,PAGE_HEIGHT)
@@ -37,5 +37,5 @@ class PptxService:
         # print(project_site_model)
 
 
-        prs.save("result.pptx")
+        # prs.save("result.pptx")
         prs.save(output_path)

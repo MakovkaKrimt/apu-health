@@ -52,7 +52,7 @@ export class AnalysisService {
 
     return {
       populationData: { ...populationRequirements },
-      policlinicsRequirements: { ...policlinicsRequirements },
+      policlinicsData: { ...policlinicsRequirements },
       total: {
         requireChild: requireChild - policlinicsRequirements.totalChild,
         requireAdult: requireAdult - policlinicsRequirements.totalAdult,

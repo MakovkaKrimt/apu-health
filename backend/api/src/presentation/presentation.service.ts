@@ -27,6 +27,8 @@ export class PresentationService {
         projectSite,
       );
 
+    // console.log(projectSitePoint);
+
     const resultProjectSiteData = {
       ...parsedProjectSiteData,
       ...projectSitePoint[0],

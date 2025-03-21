@@ -22,6 +22,8 @@ export class PythonMicroserviceService {
     formData.append('policlinics', JSON.stringify(policlinicPoints));
     formData.append('analysisData', analysisData);
 
+    // console.log('FormData', formData);
+
     const response = await firstValueFrom(
       this.httpService.post(
         `http://${pythonServiceHost}:8000/generate-pptx`,
