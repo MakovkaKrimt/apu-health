@@ -45,10 +45,6 @@ async def create_pptx(
         policlinics_data = json.loads(policlinics)
         policlinics_model = PoliclinicsModel(policlinics=policlinics_data)
 
-        # print('project_site_model',project_site_model)
-        # print('analysis_model',analysis_model)
-        # print('policlinics_model',policlinics_model)
-
             
         with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp_image:
             temp_image.write(await image.read())

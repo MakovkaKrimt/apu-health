@@ -11,12 +11,30 @@ from app.models.project_site_model import ProjectSiteModel
 
 
 class TextboxCreator:
-    def __init__(self, slide, font_name='Century Gothic', font_color = [0,0,0]):
+    def __init__(self, slide, font_name='Century Gothic', font_color=[0, 0, 0]):
         self.slide = slide
         self.font_name = font_name
         self.font_color = font_color
 
-    def add_textbox(self, point_data: ProjectSiteModel, point_emu: Tuple[float, float], textbox_width: float, textbox_height: float, top:float ,left:float):
+    def create_text(self, point_data: ProjectSiteModel):
+        pass
+
+    def generate_description(self, point_data: ProjectSiteModel) -> str:
+        if point_data.type == 'Смешанная':
+            total_capacity = point_data.capacity_child + point_data.capacity_adult
+            description = (
+                f"Смешанная поликлиника на {total_capacity} мест\n"
+                f"(Детские: {point_data.capacity_child} мест, Взрослые: {point_data.capacity_adult} мест)"
+            )
+        elif point_data.type == 'Детская':
+            description = f"Детская поликлиника на {point_data.capacity_child} мест"
+        elif point_data.type == 'Взрослая':
+            description = f"Взрослая поликлиника на {point_data.capacity_adult} мест"
+        else:
+            description = "Тип поликлиники не указан"
+        return description
+
+    def add_textbox(self, point_data: ProjectSiteModel, point_emu: Tuple[float, float], textbox_width: float, textbox_height: float, top: float, left: float):
         try:
             textbox = self.slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, textbox_width, textbox_height)
 
@@ -29,6 +47,8 @@ class TextboxCreator:
             text_frame.word_wrap = True
             text_frame.auto_size = True
 
+            print('Text data', point_data)
+
             if point_data.address:
                 text_frame.text = point_data.address
                 paragraph = text_frame.paragraphs[0]
@@ -39,111 +59,17 @@ class TextboxCreator:
                 paragraph.font.italic = False
                 paragraph.font.bold = True
 
-            # if point_data.type:
-            #     paragraph = text_frame.add_paragraph()
-            #     paragraph.text = f"{point_data.type}  поликлиника на "
-            #     paragraph.alignment = PP_ALIGN.CENTER
-            #     paragraph.font.name = self.font_name
-            #     paragraph.font.size = Pt(12)
-            #     paragraph.font.color.rgb = RGBColor(*self.font_color)
-            #     paragraph.font.italic = True
-            #     paragraph.font.bold = False
-
-            # if point_data.revenue_2023:
-            #     paragraph = text_frame.add_paragraph()
-            #     run1 = paragraph.add_run()
-            #     run1.text = "Выручка - "
-            #     run1.font.bold = False
-            #     run1.font.italic = False
-            #     run1.font.name = "TT Moscow Economy"
-            #     run1.font.size = Pt(11.2)
-            #     run1.font.color.rgb = font_color
-
-            #     run2 = paragraph.add_run()
-            #     run2.text = point_data.revenue_2023
-            #     run2.font.bold = True
-            #     run2.font.italic = False
-            #     run2.font.name = "TT Moscow Economy"
-            #     run2.font.size = Pt(11.2)
-            #     run2.font.color.rgb = font_color
-
-            #     run3 = paragraph.add_run()
-            #     run3.text = " млн руб."
-            #     run3.font.bold = True
-            #     run3.font.italic = False
-            #     run3.font.name = "TT Moscow Economy"
-            #     run3.font.size = Pt(11.2)
-            #     run3.font.color.rgb = font_color
-
-            # if point_data.number_2023:
-            #     paragraph = text_frame.add_paragraph()
-            #     run1 = paragraph.add_run()
-            #     run1.text = "Численность - "
-            #     run1.font.bold = False
-            #     run1.font.italic = False
-            #     run1.font.name = "TT Moscow Economy"
-            #     run1.font.size = Pt(11.2)
-            #     run1.font.color.rgb = font_color
-
-            #     run2 = paragraph.add_run()
-            #     run2.text = point_data.number_2023
-            #     run2.font.bold = True
-            #     run2.font.italic = False
-            #     run2.font.name = "TT Moscow Economy"
-            #     run2.font.size = Pt(11.2)
-            #     run2.font.color.rgb = font_color
-
-            # if point_data.salary_2023:
-            #     paragraph = text_frame.add_paragraph()
-            #     run1 = paragraph.add_run()
-            #     run1.text = "Средняя з/п - "
-            #     run1.font.bold = False
-            #     run1.font.italic = False
-            #     run1.font.name = "TT Moscow Economy"
-            #     run1.font.size = Pt(11.2)
-            #     run1.font.color.rgb = font_color
-
-            #     run2 = paragraph.add_run()
-            #     run2.text = str(point_data.salary_2023)
-            #     run2.font.bold = True
-            #     run2.font.italic = False
-            #     run2.font.name = "TT Moscow Economy"
-            #     run2.font.size = Pt(11.2)
-            #     run2.font.color.rgb = font_color
-
-            #     run3 = paragraph.add_run()
-            #     run3.text = " тыc. руб."
-            #     run3.font.bold = True
-            #     run3.font.italic = False
-            #     run3.font.name = "TT Moscow Economy"
-            #     run3.font.size = Pt(11.2)
-            #     run3.font.color.rgb = font_color
-
-            # if point_data.taxes_2023:
-            #     paragraph = text_frame.add_paragraph()
-            #     run1 = paragraph.add_run()
-            #     run1.text = "Налоги - "
-            #     run1.font.bold = False
-            #     run1.font.italic = False
-            #     run1.font.name = "TT Moscow Economy"
-            #     run1.font.size = Pt(11.2)
-            #     run1.font.color.rgb = font_color
-
-            #     run2 = paragraph.add_run()
-            #     run2.text = str(point_data.taxes_2023)
-            #     run2.font.bold = True
-            #     run2.font.italic = False
-            #     run2.font.name = "TT Moscow Economy"
-            #     run2.font.size = Pt(11.2)
-            #     run2.font.color.rgb = font_color
-
-            #     run3 = paragraph.add_run()
-            #     run3.text = " млн руб."
-            #     run3.font.bold = True
-            #     run3.font.italic = False
-            #     run3.font.name = "TT Moscow Economy"
-            #     run3.font.size = Pt(11.2)
-            #     run3.font.color.rgb = font_color
+            description = self.generate_description(point_data)
+            if description:
+                paragraph = text_frame.add_paragraph()
+                paragraph.text = description
+                paragraph.alignment = PP_ALIGN.CENTER
+                paragraph.font.name = self.font_name
+                paragraph.font.size = Pt(12)
+                paragraph.font.color.rgb = RGBColor(*self.font_color)
+                paragraph.font.italic = False
+                paragraph.font.bold = True
+                paragraph.font.underline  = True
 
             return textbox
         except Exception as e:

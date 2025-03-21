@@ -104,7 +104,7 @@ export class DatatabaseQueryService {
         SELECT ST_Union(ST_SetSRID(ST_GeomFromText($2), 4326)) AS geom
     )
     SELECT
-        SUM(CASE WHEN ST_Intersects(p.geom, ST_Difference(imin.geom, imax.geom)) THEN p.population_stat ELSE 0 END) AS total_population_isochrone_min,
+        SUM(CASE WHEN ST_Intersects(p.geom, imin.geom) THEN p.population_stat ELSE 0 END) AS total_population_isochrone_min,
         SUM(CASE WHEN ST_Intersects(p.geom, ST_Difference(imax.geom, imin.geom)) THEN p.population_stat ELSE 0 END) AS total_population_isochrone_max
     FROM
         population p,

@@ -20,8 +20,6 @@ class PptxService:
         prs = Presentation(template_path)
         slide = prs.slides[0]
 
-        # print('lhlhl',analysis_model)
-
         text_manager = TextManager(slide)
         point_manager = PointManager(slide,PAGE_HEIGHT)
         callout_manager = CalloutManager(slide,PAGE_HEIGHT)
@@ -34,8 +32,6 @@ class PptxService:
 
         callout_manager.add_callout(project_site_model)
 
-        # print(project_site_model)
 
-
-        # prs.save("result.pptx")
-        prs.save(output_path)
+        prs.save('new-result.pptx')
+        # prs.save(output_path)

@@ -22,7 +22,7 @@ class PointCreator:
             point.line.color.rgb = RGBColor(0, 0, 8)
             point.line.width = Pt(0.5)
 
-            point.rotation = -45
+            # point.rotation = -45
 
             return point
         except Exception as e:

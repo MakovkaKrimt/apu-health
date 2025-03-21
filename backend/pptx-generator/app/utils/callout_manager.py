@@ -43,17 +43,11 @@ class CalloutManager:
         try:
             point_emu = (Mm(site.x),Mm(self.slide_height_mm - site.y))
 
-            point = self.point_creator.add_site(point_emu,MSO_SHAPE.RECTANGLE,Mm(5.0), Mm(5.0))
+            point = self.point_creator.add_site(point_emu,MSO_SHAPE.DIAMOND,Mm(5.0), Mm(5.0))
 
             textbox = self.textbox_creator.add_textbox(site, point_emu, Mm(166.1), Mm(26.1), Mm(38.9),Mm(26.6))
 
-            #     connector = self.connector_creator.add_connector(pin, textbox)
+            self.connector_creator.add_connector(point, textbox)
 
-            #     textboxes.append(textbox)
-            #     connectors.append(connector)
-
-
-            # group_shape = self.slide.shapes.add_group_shape([pin, *textboxes, *connectors])
-            # group_shape.name = f"Callout_{point.inn}"
         except Exception as e:
             print(f"Ошибка при добавлении проектной точки на слайд: {e}")
