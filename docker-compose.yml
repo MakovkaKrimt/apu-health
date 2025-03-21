@@ -8,28 +8,6 @@ include:
   - ./geoserver/docker-compose.yml
 
 services:
-  apu-db:
-    image: kartoza/postgis:${POSTGIS_VERSION_TAG}
-    container_name: apu-db
-    volumes:
-      - apu-db-data:/var/lib/postgresql
-    ports:
-      - "${POSTGRES_PORT}:5432"
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASS=${POSTGRES_PASS}
-    restart: on-failure
-    healthcheck:
-      test: "PGPASSWORD=${POSTGRES_PASS} pg_isready -h 127.0.0.1 -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
-      start_period: 1m
-    networks:
-      - apu-network
-      - dipp_network
-
   apu-api:
     container_name: apu-api
     build:
