@@ -12,8 +12,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PresentationService } from './presentation.service';
 import { Response } from 'express';
-import { GenerateDto } from './dto/generate.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { GeneratePresentationDto } from './dto/generate.dto';
 
 @ApiTags('Генерация PPTX')
 @Controller('presentation')
@@ -26,9 +26,11 @@ export class PresentationController {
   @UseInterceptors(FileInterceptor('image'))
   async generatePptx(
     @UploadedFile() image: Express.Multer.File,
-    @Body() dto: GenerateDto,
+    @Body() dto: GeneratePresentationDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+    // return await this.presentationService.generatePptx(image, dto);
+
     const pptxStream = await this.presentationService.generatePptx(image, dto);
 
     this.logger.log(

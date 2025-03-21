@@ -12,17 +12,15 @@ export class PythonMicroserviceService {
 
   async generatePptx(
     file: Express.Multer.File,
-    polyclinics: any[],
-    populationData: any[],
-    projectArea?: string,
+    projectSiteData: any,
+    policlinicPoints: any,
+    analysisData: any,
   ) {
     const formData = new FormData();
     formData.append('image', new Blob([file.buffer]), file.originalname);
-    formData.append('polyclinics', JSON.stringify(polyclinics));
-    formData.append('populationData', JSON.stringify(populationData));
-    if (projectArea) {
-      formData.append('projectArea', JSON.stringify(projectArea));
-    }
+    formData.append('projectSite', JSON.stringify(projectSiteData));
+    formData.append('policlinics', JSON.stringify(policlinicPoints));
+    formData.append('analysisData', analysisData);
 
     const response = await firstValueFrom(
       this.httpService.post(

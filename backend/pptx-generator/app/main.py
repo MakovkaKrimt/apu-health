@@ -1,58 +1,47 @@
 import json
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import StreamingResponse
-from app.models.policlinics_model import PoliclinicsDTO
+from app.models.analysis_model import AnalysisModel
+from app.models.policlinics_model import PoliclinicsModel
 from app.models.population_model import PopulationDTO
+from app.models.project_site_model import ProjectSiteModel
 from app.services.pptx_service import PptxService
 import os
 import tempfile
+import traceback
 
 app = FastAPI()
 
 TEMPLATE_PATH = "./templates/template.pptx"
 
+@app.get("/")
+async def health_check():
+    return {
+        "healthy":1
+    }
+
+
 @app.post("/generate-pptx")
 async def create_pptx(
     image: UploadFile = File(...), 
-    polyclinics: str = Form(...),  
-    populationData:str = Form(...),
-    projectArea: str = Form(None)     
+    projectSite: str = Form(...),
+    analysisData:str = Form(...),
+    policlinics:str=Form(...)
 ):
 
     temp_image_path = None
     temp_pptx_path = None
     try:
-        try:
-            polyclinics_data = json.loads(polyclinics)
-        except json.JSONDecodeError as e:
-            raise HTTPException(status_code=400, detail=f"Ошибка парсинга polyclinics: {e}")
-        
-        policlinics_dto = PoliclinicsDTO(policlinics=polyclinics_data)
+        project_site = json.loads(projectSite)
+        project_site_model = ProjectSiteModel(**project_site)
 
+        analysis_data = json.loads(analysisData)
+        analysis_model = AnalysisModel(**analysis_data)
 
-        try:
-            population_data = json.loads(populationData)
-        except json.JSONDecodeError as e:
-            raise HTTPException(status_code=400, detail=f"Ошибка парсинга polyclinics: {e}")
-        
+        policlinics_data = json.loads(policlinics)
+        policlinics_model = PoliclinicsModel(policlinics=policlinics_data)
 
-        # print('population exts',population_data)
-
-        population_dto = PopulationDTO(
-            min_zone_population=population_data[0]['total_population_isochrone_min'],
-            max_zone_population=population_data[0]['total_population_isochrone_max'] 
-        )
-        # print('populationData',population_dto)
-
-
-        project_area = None
-        if projectArea:
-            try:
-                project_area = json.loads(projectArea)
-            except json.JSONDecodeError as e:
-                raise HTTPException(status_code=400, detail=f"Ошибка парсинга projectArea: {e}")
-            
-
+        # print('Policlinics',policlinics_model)
             
         with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp_image:
             temp_image.write(await image.read())
@@ -62,7 +51,7 @@ async def create_pptx(
             temp_pptx_path = temp_pptx.name
 
         pptx_service = PptxService()
-        await pptx_service.generate_pptx(TEMPLATE_PATH, temp_image_path, temp_pptx_path,policlinics_dto,population_dto,project_area)
+        await pptx_service.generate_pptx(TEMPLATE_PATH, temp_image_path, temp_pptx_path,analysis_model,policlinics_model,project_site_model)
 
         print('Complete!')
 
@@ -74,6 +63,7 @@ async def create_pptx(
         )
         return response
     except Exception as e:
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         if temp_pptx_path and os.path.exists(temp_pptx_path):

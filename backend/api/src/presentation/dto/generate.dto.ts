@@ -1,15 +1,15 @@
 import { IsString } from 'class-validator';
 
-export class GenerateDto {
+export class GeneratePresentationDto {
   @IsString()
   extent: string;
 
   @IsString()
-  projectAreaIsochrone: string;
+  projectSite: string;
 
   @IsString()
-  polyclinicsIsochrone: string;
+  projectSiteData: string;
 
   @IsString()
-  projectArea?: string;
+  analysisData: string;
 }

@@ -1,8 +1,7 @@
-// presentation.service.ts
 import { Injectable } from '@nestjs/common';
 import { PythonMicroserviceService } from '../python-microservice/python-microservice.service';
 import { DatatabaseQueryService } from 'src/database-queries/database-query.service';
-import { GenerateDto } from './dto/generate.dto';
+import { GeneratePresentationDto } from './dto/generate.dto';
 
 @Injectable()
 export class PresentationService {
@@ -13,25 +12,36 @@ export class PresentationService {
 
   async generatePptx(
     file: Express.Multer.File,
-    { extent, projectAreaIsochrone, polyclinicsIsochrone }: GenerateDto,
+    {
+      extent,
+      projectSite,
+      projectSiteData,
+      analysisData,
+    }: GeneratePresentationDto,
   ) {
-    const polyclinics =
-      await this.databaseQueryService.findPolyclinicsByExtentIntersection(
+    const parsedProjectSiteData = JSON.parse(projectSiteData);
+
+    const projectSitePoint =
+      await this.databaseQueryService.transformProjectSiteToPPTXScale(
         extent,
-        projectAreaIsochrone,
+        projectSite,
       );
 
-    const populationData =
-      await this.databaseQueryService.findPopulationSumByIsochroneIntersections(
-        projectAreaIsochrone,
-        polyclinicsIsochrone,
+    const resultProjectSiteData = {
+      ...parsedProjectSiteData,
+      ...projectSitePoint[0],
+    };
+
+    const policlinicPoints =
+      await this.databaseQueryService.findPoliclinicsByExtentIntersection(
+        extent,
       );
 
-    const pptx = await this.pythonMicroserviceService.generatePptx(
+    return await this.pythonMicroserviceService.generatePptx(
       file,
-      polyclinics,
-      populationData,
+      resultProjectSiteData,
+      policlinicPoints,
+      analysisData,
     );
-    return pptx;
   }
 }

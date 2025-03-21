@@ -1,7 +1,7 @@
 import { ViewEntity, ViewColumn, Point } from 'typeorm';
 
 @ViewEntity({ schema: 'public', name: 'v_polyclinic' })
-export class VPolyclinic {
+export class VPoliclinic {
   @ViewColumn()
   id: number;
 

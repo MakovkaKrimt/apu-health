@@ -1,50 +1,62 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { VPolyclinic } from './entitties/v_polycinic.entity';
+import { VPoliclinic } from './entitties/v_polycinic.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class DatatabaseQueryService {
   constructor(
-    @InjectRepository(VPolyclinic)
-    private readonly vPolyclinicRepository: Repository<VPolyclinic>,
+    @InjectRepository(VPoliclinic)
+    private readonly vpoliclinicRepository: Repository<VPoliclinic>,
   ) {}
 
-  async findPolyclinicsByExtentIntersection(
-    extent: string,
-    projectAreaIsochrone: string,
-  ) {
+  async transformProjectSiteToPPTXScale(extent: string, projectSite: string) {
+    const query = `
+          WITH extent AS (
+              SELECT ST_SetSRID(ST_GeomFromText($1), 4326) AS geom
+          ),
+          site AS (
+              SELECT ST_SetSRID(ST_GeomFromText($2), 4326) AS geom
+          )
+          SELECT
+              ST_X(points.geom) AS x,
+              ST_Y(points.geom) AS y
+          FROM extent e, site s
+          JOIN LATERAL (
+              SELECT __transform_to_prez_scale(e.geom, s.geom, 163.7, 166.5, 26.0, 64.0) AS geom
+          ) AS points ON true
+      `;
+    const policlinicsData = await this.vpoliclinicRepository.query(query, [
+      extent,
+      projectSite,
+    ]);
+
+    return policlinicsData;
+  }
+
+  async findPoliclinicsByExtentIntersection(extent: string) {
     const query = `
         WITH extent AS (
             SELECT ST_SetSRID(ST_GeomFromText($1), 4326) AS geom
         ),
-        proj_area_isochrone AS (
-            SELECT ST_SetSRID(ST_GeomFromText($2), 4326) AS geom
-        ),
         points AS (
             SELECT
-                v.id,
                 v.type,
-                v.design_capacity_adults,
-                v.design_capacity_kids,
                 ST_X(points.geom) AS x,
-                ST_Y(points.geom) AS y,
-                ST_Intersects(v.geom, proj_area_isochrone.geom) AS within_isochrone
+                ST_Y(points.geom) AS y
             FROM extent e
-            JOIN v_polyclinics v ON ST_Intersects(e.geom, v.geom)
+            JOIN v_policlinics v ON ST_Intersects(e.geom, v.geom)
             JOIN LATERAL (
                 SELECT __transform_to_prez_scale(e.geom, v.geom, 163.7, 166.5, 26.0, 64.0) AS geom
             ) AS points ON true
-            CROSS JOIN proj_area_isochrone
         )
         SELECT * FROM points;
       `;
-    const polyclinicsData = await this.vPolyclinicRepository.query(query, [
+    const policlinicsData = await this.vpoliclinicRepository.query(query, [
       extent,
-      projectAreaIsochrone,
     ]);
 
-    return polyclinicsData;
+    return policlinicsData;
   }
 
   async findPolicilinicsSumByIsochroneIntersection(
@@ -52,8 +64,7 @@ export class DatatabaseQueryService {
   ) {
     const query = `    
       WITH isochrone_min AS (
-          SELECT 
-              ST_SetSRID(ST_GeomFromText($1), 4326) AS geom
+          SELECT ST_Union(ST_SetSRID(ST_GeomFromText($1), 4326)) AS geom
       ),
       subquery as (
       SELECT 
@@ -63,7 +74,7 @@ export class DatatabaseQueryService {
           COUNT(*) FILTER (WHERE type = 'взрослая')::integer AS adult_count,
           COUNT(*) FILTER (WHERE type = 'смешанная')::integer AS mixed_count
       FROM
-          v_polyclinics v,
+          v_policlinics v,
           isochrone_min imin
       WHERE
           ST_Intersects(v.geom, imin.geom)
@@ -74,7 +85,7 @@ export class DatatabaseQueryService {
         FROM subquery s;
         `;
 
-    const policlinicsData = await this.vPolyclinicRepository.query(query, [
+    const policlinicsData = await this.vpoliclinicRepository.query(query, [
       projectAreaIsochrone,
     ]);
 
@@ -83,15 +94,14 @@ export class DatatabaseQueryService {
 
   async findPopulationSumByIsochroneIntersections(
     projectAreaIsochrone: string,
-    polyclinicsIsochrone: string,
+    policlinicsIsochrone: string,
   ) {
     const query = `
     WITH isochrone_min AS (
         SELECT 
             ST_SetSRID(ST_GeomFromText($1), 4326) AS geom),
     isochrone_max AS (
-        SELECT 	
-            ST_SetSRID(ST_GeomFromText($2), 4326) AS geom
+        SELECT ST_Union(ST_SetSRID(ST_GeomFromText($2), 4326)) AS geom
     )
     SELECT
         SUM(CASE WHEN ST_Intersects(p.geom, ST_Difference(imin.geom, imax.geom)) THEN p.population_stat ELSE 0 END) AS total_population_isochrone_min,
@@ -103,9 +113,31 @@ export class DatatabaseQueryService {
     WHERE
         ST_Intersects(p.geom, ST_Union(imin.geom, imax.geom));
       `;
-    const populationData = await this.vPolyclinicRepository.query(query, [
+    const populationData = await this.vpoliclinicRepository.query(query, [
       projectAreaIsochrone,
-      polyclinicsIsochrone,
+      policlinicsIsochrone,
+    ]);
+
+    return populationData;
+  }
+
+  async findPopulationByProjAreaIsochroneIntersection(
+    projectAreaIsochrone: string,
+  ) {
+    const query = `
+    WITH isochrone_min AS (
+        SELECT 
+            ST_SetSRID(ST_GeomFromText($1), 4326) AS geom)
+    SELECT
+        SUM(p.population_stat) AS total_population_isochrone_min
+    FROM
+        population p,
+        isochrone_min imin
+    WHERE
+        ST_Intersects(p.geom, imin.geom);
+      `;
+    const populationData = await this.vpoliclinicRepository.query(query, [
+      projectAreaIsochrone,
     ]);
 
     return populationData;
