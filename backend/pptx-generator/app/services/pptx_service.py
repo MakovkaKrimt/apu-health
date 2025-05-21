@@ -33,5 +33,5 @@ class PptxService:
         callout_manager.add_callout(project_site_model)
 
 
-        # prs.save('new-result.pptx')
-        prs.save(output_path)
+        prs.save('new-result.pptx')
+        # prs.save(output_path)

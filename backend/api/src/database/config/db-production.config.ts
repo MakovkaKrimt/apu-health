@@ -7,6 +7,7 @@ export default (): PostgresConnectionOptions => ({
   port: Number(process.env.DB_PORT).valueOf(),
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
+  schema: process.env.DB_SCHEMA,
   synchronize: false,
   entities: [__dirname + '/../../**/*.entity{.js,.ts}'],
 });

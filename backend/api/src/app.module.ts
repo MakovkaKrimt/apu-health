@@ -8,6 +8,8 @@ import dbProductionConfig from './database/config/db-production.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AnalysisModule } from './analysis/analysis.module';
+import { HealthcareModule } from './healthcare/healthcare.module';
+import { PopulationModule } from './population/population.module';
 
 @Module({
   imports: [
@@ -20,10 +22,12 @@ import { AnalysisModule } from './analysis/analysis.module';
           : '.env.development',
       load: [dbConfig, dbProductionConfig],
     }),
-    DatabaseQueryModule,
+    // DatabaseQueryModule,
     DatabaseModule,
-    PresentationModule,
-    AnalysisModule,
+    // PresentationModule,
+    // AnalysisModule,
+    HealthcareModule,
+    PopulationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

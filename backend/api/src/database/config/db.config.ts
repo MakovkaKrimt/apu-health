@@ -11,6 +11,10 @@ export default registerAs(
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     synchronize: false,
+    // schema: process.env.DB_SCHEMAS.split(','),
+    extra: {
+      searchPath: process.env.DB_SCHEMAS?.split(',') || ['healthcare'],
+    },
     entities: [__dirname + '/../../**/*.entity{.js,.ts}'],
     // dropSchema: true,
   }),

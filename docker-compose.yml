@@ -1,8 +1,6 @@
 networks:
   apu-network:
     external: true
-  dipp_network:
-    external: true
 
 include:
   - ./geoserver/docker-compose.yml
@@ -23,17 +21,17 @@ services:
       apu-db:
         condition: service_healthy
 
-  apu-pptx-generator:
-    container_name: apu-py
-    build:
-      context: ./backend/pptx-generator
-      dockerfile: Dockerfile.prod
-    ports:
-      - "8002:8000"
-    volumes:
-      - ./backend/pptx-generator/app:/app/app
-    environment:
-      - WORKERS=${WORKERS:-2}
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers ${WORKERS:-2}
-    networks:
-      - apu-network
+  # apu-pptx-generator:
+  #   container_name: apu-py
+  #   build:
+  #     context: ./backend/pptx-generator
+  #     dockerfile: Dockerfile.prod
+  #   ports:
+  #     - "8002:8000"
+  #   volumes:
+  #     - ./backend/pptx-generator/app:/app/app
+  #   environment:
+  #     - WORKERS=${WORKERS:-2}
+  #   command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers ${WORKERS:-2}
+  #   networks:
+  #     - apu-network
